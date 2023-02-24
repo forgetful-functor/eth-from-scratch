@@ -1,8 +1,9 @@
 const STOP  = 'STOP'
 const ADD   = 'ADD'
 const PUSH  = 'PUSH'
-
-const program = ['PUSH', 2, 'PUSH', 3, 'ADD', 'STOP']
+const SUB   = 'SUB'
+const MUL   = 'MUL'
+const DIV   = 'DIV'
 
 class Interpreter {
     constructor() {
@@ -28,10 +29,21 @@ class Interpreter {
                         this.state.stack.push(this.state.code[this.state.programCounter])
                         break
                     case ADD:
-                        const first = this.state.stack.pop()
-                        const second = this.state.stack.pop()
-                        this.state.stack.push(first + second)
+                    case SUB:
+                    case MUL:
+                    case DIV:
+                        const a = this.state.stack.pop()
+                        const b = this.state.stack.pop()
+                        let result;
+                        
+                        if(opCode === ADD) result = a + b
+                        if(opCode === SUB) result = a - b
+                        if(opCode === MUL) result = a * b
+                        if(opCode === DIV) result = a / b
+
+                        this.state.stack.push(result)
                         break
+
                     default:
                         break;
                 }
@@ -42,8 +54,18 @@ class Interpreter {
             return this.state.stack[this.state.stack.length - 1]
         }
     }
+
+    
 }
 
-const interpreter = new Interpreter()
+const logProgramResult = (p) => {
+    console.log(new Interpreter().runCode(p))
+}
 
-console.log(interpreter.runCode(program))
+const program = [PUSH, 2, PUSH, 3, ADD, PUSH, 5, MUL, STOP]
+
+logProgramResult(program) //25
+
+const program2 = [PUSH, 22, PUSH, 11, DIV, PUSH, 5, MUL, PUSH, 13, SUB, STOP]
+
+logProgramResult(program2) //3
