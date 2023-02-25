@@ -41,4 +41,34 @@ describe('Block', () => {
             expect(underTargetHash < target).toBe(true)
         })
     })
+
+    describe('adjustDifficulty()', () => {
+        it('keeps difficulty above 0', () => {
+            expect(
+                Block.adjustDifficulty({
+                    lastBlock: { blockHeaders: { difficulty: 0 } },
+                    timestamp: Date.now()
+                })
+            ).toEqual(1)
+        })
+
+        it('decreases difficulty if current block mined too slow', ()  => {
+            expect(
+                Block.adjustDifficulty({
+                    lastBlock: { blockHeaders: { difficulty: 12, timestamp: Date.now() - 25 * 1000 } },
+                    timestamp: Date.now()
+                })
+            ).toEqual(11)
+        })
+
+
+        it('increases difficulty if current block mined too fast', ()  => {
+            expect(
+                Block.adjustDifficulty({
+                    lastBlock: { blockHeaders: { difficulty: 12, timestamp: Date.now() - 5 * 1000} },
+                    timestamp: Date.now()
+                })
+            ).toEqual(13)
+        })
+    })
 })
