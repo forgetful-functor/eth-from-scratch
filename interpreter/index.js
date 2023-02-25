@@ -1,9 +1,16 @@
 const STOP  = 'STOP'
 const ADD   = 'ADD'
 const PUSH  = 'PUSH'
+
 const SUB   = 'SUB'
 const MUL   = 'MUL'
 const DIV   = 'DIV'
+
+const LT    = 'LT'
+const GT    = 'GT'
+const EQ    = 'EQ'
+const AND   = 'AND'
+const OR    = 'OR' 
 
 class Interpreter {
     constructor() {
@@ -32,6 +39,11 @@ class Interpreter {
                     case SUB:
                     case MUL:
                     case DIV:
+                    case LT:
+                    case GT:
+                    case EQ:
+                    case AND:
+                    case OR:
                         const a = this.state.stack.pop()
                         const b = this.state.stack.pop()
                         let result;
@@ -40,6 +52,11 @@ class Interpreter {
                         if(opCode === SUB) result = a - b
                         if(opCode === MUL) result = a * b
                         if(opCode === DIV) result = a / b
+                        if(opCode === LT)  result = a < b   ? 1 : 0 
+                        if(opCode === GT)  result = a > b   ? 1 : 0
+                        if(opCode === EQ)  result = a === b ? 1 : 0
+                        if(opCode === AND) result = a && b
+                        if(opCode === OR)  result = a || b
 
                         this.state.stack.push(result)
                         break
@@ -58,14 +75,28 @@ class Interpreter {
     
 }
 
-const logProgramResult = (p) => {
-    console.log(new Interpreter().runCode(p))
+const logProgramResult = (p, msg) => {
+    console.log(`${msg} = ${new Interpreter().runCode(p)}`)
 }
 
 const program = [PUSH, 2, PUSH, 3, ADD, PUSH, 5, MUL, STOP]
-
-logProgramResult(program) //25
+logProgramResult(program, "5 * (3 + 2)") //25
 
 const program2 = [PUSH, 22, PUSH, 11, DIV, PUSH, 5, MUL, PUSH, 13, SUB, STOP]
+logProgramResult(program2, "13 - (5 * (11/22))") //10.5
 
-logProgramResult(program2) //3
+const program3 = [PUSH, 4, PUSH, 5, LT, STOP]
+logProgramResult(program3, "5 < 4") //0 = false
+
+const program4 = [PUSH, 4, PUSH, 5, GT, STOP]
+logProgramResult(program4, "5 > 4") //1 = true
+
+const program5 = [PUSH, 5, PUSH, 5, EQ, STOP]
+logProgramResult(program5, "5 == 5") //1 = true
+
+const program6 = [PUSH, 1, PUSH, 0, OR, STOP]
+logProgramResult(program6, "1 && 0")
+
+const program7 = [PUSH, 1, PUSH, 0, AND, STOP]
+logProgramResult(program7, "1 || 0")
+
