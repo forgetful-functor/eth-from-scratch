@@ -15,17 +15,24 @@ const OR    = 'OR'
 const JUMP  = 'JUMP'
 const JUMPI = 'JUMPI'
 
+const EXECUTION_COMPLETE = 'EXECUTION_COMPLETE'
+const EXECUTION_LIMIT    = 10000
+
 class Interpreter {
     constructor() {
         this.state = {
             programCounter: 0,
             stack: [],
-            code: []
+            code: [],
+            executionCount: 0
         }
     }
 
     jump() {
         const destination = this.state.stack.pop()
+        if(destination < 0 || destination > this.state.code.length){
+            throw new Error(`Invalid destination: ${destination}`)
+        }
         this.state.programCounter = destination
         this.state.programCounter--
     }
@@ -35,13 +42,22 @@ class Interpreter {
             this.state.code = code;
 
             while(this.state.programCounter < this.state.code.length) {
+
+                this.state.executionCount++
+                if(this.state.executionCount > EXECUTION_LIMIT){
+                    throw new Error(`Check for infinite loop. Execution limit of ${EXECUTION_LIMIT} has been exceeded`)
+                }
+
                 const opCode = this.state.code[this.state.programCounter];
 
                 switch(opCode) {
                     case STOP:
-                        throw new Error("Program finished")
+                        throw new Error(EXECUTION_COMPLETE)
                     case PUSH:
                         this.state.programCounter++;
+                        if(this.state.programCounter == this.state.code.length) {
+                            throw new Error('Push instruction cannot be last')
+                        }
                         this.state.stack.push(this.state.code[this.state.programCounter])
                         break
                     case ADD:
@@ -85,15 +101,21 @@ class Interpreter {
                 this.state.programCounter++;
             }
         } catch(err) {
-            return this.state.stack[this.state.stack.length - 1]
+            if(err.message === EXECUTION_COMPLETE){
+                return this.state.stack[this.state.stack.length - 1]
+            }
+
+            throw err;
         }
     }
-
-    
 }
 
 const logProgramResult = (p, msg) => {
-    console.log(`${msg} = ${new Interpreter().runCode(p)}`)
+    try{
+        console.log(`${msg} = ${new Interpreter().runCode(p)}`)
+    } catch(err) {
+        console.log(`ERROR: ${err.message}`)
+    }
 }
 
 const program = [PUSH, 2, PUSH, 3, ADD, PUSH, 5, MUL, STOP]
@@ -122,3 +144,12 @@ logProgramResult(program8, "Result of jump")
 
 const program9 = [PUSH, 8, PUSH, 1, JUMPI, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
 logProgramResult(program9, "Result of jumpi")
+
+const program10 = [PUSH, 12, PUSH, 1, JUMPI, PUSH, 0, JUMP, PUSH, 'jump succesful', STOP]
+logProgramResult(program10, "Result of invalid destination jump")
+
+const program11 = [PUSH, 0, PUSH]
+logProgramResult(program11, "Result of invalid PUSH position")
+
+const program12 = [PUSH, 0, PUSH, 1, JUMPI, STOP]
+logProgramResult(program12, "Result of infinite loop")
