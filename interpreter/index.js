@@ -15,6 +15,22 @@ const OR    = 'OR'
 const JUMP  = 'JUMP'
 const JUMPI = 'JUMPI'
 
+const OPCODE_MAP = {
+    STOP,
+    ADD,
+    PUSH, 
+    SUB, 
+    MUL, 
+    DIV, 
+    LT, 
+    GT, 
+    EQ, 
+    AND, 
+    OR, 
+    JUMP, 
+    JUMPI 
+}
+
 const EXECUTION_COMPLETE = 'EXECUTION_COMPLETE'
 const EXECUTION_LIMIT    = 10000
 
@@ -118,38 +134,42 @@ const logProgramResult = (p, msg) => {
     }
 }
 
-const program = [PUSH, 2, PUSH, 3, ADD, PUSH, 5, MUL, STOP]
-logProgramResult(program, "5 * (3 + 2)") //25
+Interpreter.OPCODE_MAP = OPCODE_MAP
 
-const program2 = [PUSH, 22, PUSH, 11, DIV, PUSH, 5, MUL, PUSH, 13, SUB, STOP]
-logProgramResult(program2, "13 - (5 * (11/22))") //10.5
+module.exports = Interpreter;
 
-const program3 = [PUSH, 4, PUSH, 5, LT, STOP]
-logProgramResult(program3, "5 < 4") //0 = false
+// const program = [PUSH, 2, PUSH, 3, ADD, PUSH, 5, MUL, STOP]
+// logProgramResult(program, "5 * (3 + 2)") //25
 
-const program4 = [PUSH, 4, PUSH, 5, GT, STOP]
-logProgramResult(program4, "5 > 4") //1 = true
+// const program2 = [PUSH, 22, PUSH, 11, DIV, PUSH, 5, MUL, PUSH, 13, SUB, STOP]
+// logProgramResult(program2, "13 - (5 * (11/22))") //10.5
 
-const program5 = [PUSH, 5, PUSH, 5, EQ, STOP]
-logProgramResult(program5, "5 == 5") //1 = true
+// const program3 = [PUSH, 4, PUSH, 5, LT, STOP]
+// logProgramResult(program3, "5 < 4") //0 = false
 
-const program6 = [PUSH, 1, PUSH, 0, OR, STOP]
-logProgramResult(program6, "1 && 0")
+// const program4 = [PUSH, 4, PUSH, 5, GT, STOP]
+// logProgramResult(program4, "5 > 4") //1 = true
 
-const program7 = [PUSH, 1, PUSH, 0, AND, STOP]
-logProgramResult(program7, "1 || 0")
+// const program5 = [PUSH, 5, PUSH, 5, EQ, STOP]
+// logProgramResult(program5, "5 == 5") //1 = true
 
-const program8 = [PUSH, 6, JUMP, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
-logProgramResult(program8, "Result of jump")
+// const program6 = [PUSH, 1, PUSH, 0, OR, STOP]
+// logProgramResult(program6, "1 && 0")
 
-const program9 = [PUSH, 8, PUSH, 1, JUMPI, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
-logProgramResult(program9, "Result of jumpi")
+// const program7 = [PUSH, 1, PUSH, 0, AND, STOP]
+// logProgramResult(program7, "1 || 0")
 
-const program10 = [PUSH, 12, PUSH, 1, JUMPI, PUSH, 0, JUMP, PUSH, 'jump succesful', STOP]
-logProgramResult(program10, "Result of invalid destination jump")
+// const program8 = [PUSH, 6, JUMP, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
+// logProgramResult(program8, "Result of jump")
 
-const program11 = [PUSH, 0, PUSH]
-logProgramResult(program11, "Result of invalid PUSH position")
+// const program9 = [PUSH, 8, PUSH, 1, JUMPI, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
+// logProgramResult(program9, "Result of jumpi")
 
-const program12 = [PUSH, 0, PUSH, 1, JUMPI, STOP]
-logProgramResult(program12, "Result of infinite loop")
+// const program10 = [PUSH, 12, PUSH, 1, JUMPI, PUSH, 0, JUMP, PUSH, 'jump succesful', STOP]
+// logProgramResult(program10, "Result of invalid destination jump")
+
+// const program11 = [PUSH, 0, PUSH]
+// logProgramResult(program11, "Result of invalid PUSH position")
+
+// const program12 = [PUSH, 0, PUSH, 1, JUMPI, STOP]
+// logProgramResult(program12, "Result of infinite loop")

@@ -1,0 +1,12 @@
+{
+  "name": "eth_from_scratch",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/forgetful-functor/eth-from-scratch.git",
+  "scripts": {
+    "test": "jest --watchAll"
+  },
+  "devDependencies": {
+    "jest": "^29.4.3"
+  }
+}
