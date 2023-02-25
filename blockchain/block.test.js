@@ -71,4 +71,72 @@ describe('Block', () => {
             ).toEqual(13)
         })
     })
+
+    describe('validateBlock()', () => {
+
+        beforeEach(() => {
+            lastBlock = Block.genesis()
+            block = Block.mineBlock({lastBlock, beneficiary: 'beneficiary'})
+        })
+
+        it('resolves when the block is the genesis block', () => {
+            expect(Block.validateBlock({ block: Block.genesis() })).resolves
+        })
+
+        it('resolves when the block valid', () => {
+            expect(
+               () => Block.validateBlock({
+                        lastBlock,
+                        block
+                    })
+            ).resolves
+        })
+
+        it('rejects when the parent hash is invalid', () => {
+            block.blockHeaders.parentHash = 'foo'
+            expect(
+               () => Block.validateBlock({
+                    lastBlock,
+                    block
+                }).rejects
+            )
+        })
+
+        it('rejects when the block number increment invalid', () => {
+            block.blockHeaders.number = 20
+            expect(
+                () => Block.validateBlock({
+                     lastBlock,
+                     block
+                 }).rejects
+             )
+        })
+
+        it('rejects when the block difficulty adjustment invalid', () => {
+            block.blockHeaders.difficulty = 20
+            expect(
+                () => Block.validateBlock({
+                     lastBlock,
+                     block
+                 }).rejects
+             )
+        })
+
+        it('rejects when proof of work invalid', () => {
+            const originalCalculateBlockTargetHash = Block.calculateBlockTargetHash
+
+            Block.calculateBlockTargetHash = () => {
+                return '0'.repeat(64)
+            }
+
+            expect(
+                () => Block.validateBlock({
+                    lastBlock,
+                    block
+                })
+            ).rejects
+
+            Block.calculateBlockTargetHash = originalCalculateBlockTargetHash
+        })
+    })
 })

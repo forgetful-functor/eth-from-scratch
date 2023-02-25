@@ -84,7 +84,7 @@ class Block {
                 return reject(new Error(`The block difficulty must adjust by 1`))
             }
 
-            const target = Block.calculateBlockTargetHash( {lastBlock })
+            const target = Block.calculateBlockTargetHash({ lastBlock })
             const { blockHeaders } = block
             const { nonce } = blockHeaders
             const truncatedBlockHeaders = { ...blockHeaders }
@@ -93,7 +93,7 @@ class Block {
             const header = keccakHash(truncatedBlockHeaders)
             const underTargetHash = keccakHash( header + nonce)
 
-            if(underTargetHash > header) {
+            if(underTargetHash > target) {
                 return reject(new Error('The block does not meet the proof of work requirement'))
             }
 
