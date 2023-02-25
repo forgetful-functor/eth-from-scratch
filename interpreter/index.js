@@ -10,7 +10,10 @@ const LT    = 'LT'
 const GT    = 'GT'
 const EQ    = 'EQ'
 const AND   = 'AND'
-const OR    = 'OR' 
+const OR    = 'OR'
+
+const JUMP  = 'JUMP'
+const JUMPI = 'JUMPI'
 
 class Interpreter {
     constructor() {
@@ -19,6 +22,12 @@ class Interpreter {
             stack: [],
             code: []
         }
+    }
+
+    jump() {
+        const destination = this.state.stack.pop()
+        this.state.programCounter = destination
+        this.state.programCounter--
     }
 
     runCode(code) {
@@ -60,7 +69,15 @@ class Interpreter {
 
                         this.state.stack.push(result)
                         break
-
+                    case JUMP:
+                        this.jump()
+                        break
+                    case JUMPI:
+                        const condition = this.state.stack.pop()
+                        if(condition === 1) {
+                            this.jump()
+                        }
+                        break
                     default:
                         break;
                 }
@@ -100,3 +117,8 @@ logProgramResult(program6, "1 && 0")
 const program7 = [PUSH, 1, PUSH, 0, AND, STOP]
 logProgramResult(program7, "1 || 0")
 
+const program8 = [PUSH, 6, JUMP, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
+logProgramResult(program8, "Result of jump")
+
+const program9 = [PUSH, 8, PUSH, 1, JUMPI, PUSH,0, JUMP, PUSH, 'jump succesful', STOP]
+logProgramResult(program9, "Result of jumpi")
