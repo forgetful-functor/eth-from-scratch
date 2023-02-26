@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --watchAll",
     "start": "node ./api",
-    "dev": "yarn nodemon ./api"
+    "dev": "yarn nodemon ./api",
+    "dev-peer": "yarn nodemon ./api --peer"
   },
   "dependencies": {
     "dotenv": "^16.0.3",

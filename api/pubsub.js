@@ -15,7 +15,8 @@ const CHANNELS_MAP = {
 }
 
 class PubSub {
-    constructor() {
+    constructor({ blockchain }) {
+        this.blockchain = blockchain
         this.pubnub = new PubNub(credentials)
         this.subscribeToChannels()
         this.listen()
@@ -34,19 +35,30 @@ class PubSub {
     listen() {
         this.pubnub.addListener({
             message: (messageObject) => {
-                console.log('messageObject', messageObject)
+                const { channel, message } = messageObject
+                const parsedMessage = JSON.parse(message)
+                console.log('Message recived. Channel:', channel)
+
+                switch(channel) {
+                    case CHANNELS_MAP.BLOCK:
+                        console.log('block message', message)
+                        this.blockchain.addBlock({ block: parsedMessage})
+                            .then(() =>console.log('New block accepted'))
+                            .catch(err => console.error(err))
+                        break
+                    default:
+                        return
+                }
             } 
+        })
+    }
+
+    broadcastBlock(block) {
+        this.publish({
+            channel: CHANNELS_MAP.BLOCK,
+            message: JSON.stringify(block)
         })
     }
 }
 
 module.exports = PubSub
-
-const pubsub = new PubSub()
-
-setTimeout(() => {
-    pubsub.publish({
-        channel: CHANNELS_MAP.TEST,
-        message: 'bar'
-    })
-}, 3000)
