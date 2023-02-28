@@ -17,6 +17,13 @@ class Account {
 
         return keyFromPublic.verify(keccakHash(data), signature)
     }
+
+    toJSON(){
+        return {
+            address: this.address,
+            balance: this.balance
+        }
+    }
 }
 
 module.exports = Account
