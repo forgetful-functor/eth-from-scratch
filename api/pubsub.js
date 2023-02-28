@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const PubNub = require('pubnub')
+const Transaction = require('../transaction')
 
 const credentials = {
     publishKey: process.env.PUBLISH_KEY,
@@ -11,12 +12,14 @@ const credentials = {
 
 const CHANNELS_MAP = {
     TEST: 'TEST',
-    BLOCK: 'BLOCK'
+    BLOCK: 'BLOCK',
+    TRANSACTION: 'TRANSACTION'
 }
 
 class PubSub {
-    constructor({ blockchain }) {
+    constructor({ blockchain, transactionQueue }) {
         this.blockchain = blockchain
+        this.transactionQueue = transactionQueue
         this.pubnub = new PubNub(credentials)
         this.subscribeToChannels()
         this.listen()
@@ -46,6 +49,10 @@ class PubSub {
                             .then(() =>console.log('New block accepted'))
                             .catch(err => console.error(err))
                         break
+                    case CHANNELS_MAP.TRANSACTION:
+                        console.log(`Recieved transaction: ${parsedMessage.id}`)
+                        this.transactionQueue.add(new Transaction(parsedMessage))
+                        break
                     default:
                         return
                 }
@@ -57,6 +64,13 @@ class PubSub {
         this.publish({
             channel: CHANNELS_MAP.BLOCK,
             message: JSON.stringify(block)
+        })
+    }
+
+    broadcastTransaction(transaction){
+        this.publish({
+            channel: CHANNELS_MAP.TRANSACTION,
+            message: JSON.stringify(transaction)
         })
     }
 }

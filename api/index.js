@@ -14,9 +14,11 @@ const blockchain = new Blockchain()
 const transactionQueue = new TransactionQueue()
 const account = new Account()
 const transaction = Transaction.createTransaction({ account })
-const pubSub = new PubSub({ blockchain })
+const pubSub = new PubSub({ blockchain, transactionQueue })
 
-transactionQueue.add(transaction)
+setTimeout(() => {
+    pubSub.broadcastTransaction(transaction)
+}, 3000)
 
 app.use(bodyParser.json())
 
@@ -51,7 +53,7 @@ app.post('/account/transact', (req, res, next) => {
         value
     })
 
-    transactionQueue.add(transaction)
+    pubSub.broadcastTransaction(transaction)
 
     res.json({ transaction })
 })

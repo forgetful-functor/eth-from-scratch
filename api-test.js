@@ -18,7 +18,6 @@ const postTransact = ({ to, value }) => {
     })
 }
 
-
 postTransact({})
     .then((postTransactionResponse) => {
         console.log('Create account transaction', postTransactionResponse)
