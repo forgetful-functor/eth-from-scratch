@@ -17,6 +17,26 @@ class Blockchain {
             }).catch(reject)
         })
     }
+
+    replaceBlockchain({ chain }){
+        return new Promise(async (resolve, reject) => {
+            for(let i = 0; i < chain.length; i++){
+                const block = chain[i]
+                const lastBlockIndex = i - 1
+                const lastBlock =lastBlockIndex >= 0 ? chain[lastBlockIndex] : null
+
+                try{
+                    await Block.validateBlock({ lastBlock, block })
+                } catch (err) {
+                    return reject(err)
+                }
+            }
+
+            this.chain = chain;
+
+            return resolve()
+        })
+    }
 }
 
 module.exports = Blockchain

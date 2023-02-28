@@ -1,4 +1,6 @@
 const express = require('express')
+const request = require('request')
+
 const Blockchain = require('../blockchain')
 const Block = require('../blockchain/block')
 const PubSub = require('./pubsub')
@@ -34,9 +36,22 @@ app.use((err, req, res, next) => {
         .json({ message: err.message })
 })
 
+const peer = process.argv.includes('--peer')
+
 const PORT = 
-    process.argv.includes('--peer') 
-    ? Math.floor(2000 + Math.random() * 1000)
-    : 3000
+    peer 
+        ? Math.floor(2000 + Math.random() * 1000) 
+        : 3000
+
+if(peer) {
+    request('http://localhost:3000/blockchain', (err, response, body) => {
+        const { chain } = JSON.parse(body)
+
+        blockchain
+            .replaceBlockchain({ chain })
+            .then(() => console.log('Synchronized blockchain with the root node'))
+            .catch((err) => console.error(`Failed to synchornize the blockchain: ${err.message}`))
+    })
+}
 
 app.listen(PORT, () => console.log(`listening at PORT: ${PORT}`))
