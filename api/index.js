@@ -1,5 +1,6 @@
 const express = require('express')
 const request = require('request')
+const bodyParser = require('body-parser')
 
 const Blockchain = require('../blockchain')
 const Block = require('../blockchain/block')
@@ -16,6 +17,8 @@ const transaction = Transaction.createTransaction({ account })
 const pubSub = new PubSub({ blockchain })
 
 transactionQueue.add(transaction)
+
+app.use(bodyParser.json())
 
 app.get('/blockchain', (req, res, next) => {
     const { chain } = blockchain
@@ -37,6 +40,20 @@ app.get('/blockchain/mine', (req, res, next) => {
             res.json({ block })
         })
         .catch(next)
+})
+
+app.post('/account/transact', (req, res, next) => {
+    const { to, value } = req.body
+
+    const transaction = Transaction.createTransaction({
+        account: !to ? new Account() : account, 
+        to, 
+        value
+    })
+
+    transactionQueue.add(transaction)
+
+    res.json({ transaction })
 })
 
 app.use((err, req, res, next) => {
